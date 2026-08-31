@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Appleko — Bayi Portalı</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#17181C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Appleko">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F5F1; --ink:#17181C; --ink-soft:#5A5C66;
+    --accent:#2F5EFF; --amber:#E8A33D; --green:#2E9E6D; --red:#C1442A;
+    --line:#DEDCD4; --card:#FFFFFF;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--paper); color:var(--ink); font-family:'Inter',sans-serif;}
+  .wrap{max-width:640px; margin:0 auto; padding:28px 18px 60px;}
+  h1{font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; letter-spacing:-0.02em; margin:0 0 4px;}
+  .subtitle{color:var(--ink-soft); font-size:13px; margin:0 0 20px;}
+  .brand{display:flex; align-items:center; gap:9px; margin-bottom:22px;}
+  .brand-mark{width:30px; height:30px; border-radius:8px; background:var(--ink); display:flex; align-items:center; justify-content:center;}
+  .brand-mark svg{width:15px; height:15px; stroke:var(--paper);}
+  .brand-name{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:16px;}
+
+  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:14px;}
+  .card h3{font-family:'Space Grotesk',sans-serif; font-size:14.5px; margin:0 0 12px;}
+  label{font-size:11.5px; color:var(--ink-soft); font-weight:600; display:block; margin-bottom:4px;}
+  input,select,textarea{
+    width:100%; font-family:'Inter',sans-serif; font-size:13.5px; border:1.5px solid var(--line);
+    border-radius:8px; padding:9px 11px; background:var(--paper); color:var(--ink); outline:none;
+  }
+  input:focus,select:focus{border-color:var(--accent);}
+  .field{margin-bottom:12px;}
+  button.primary{
+    background:var(--ink); color:var(--paper); border:none; border-radius:9px; padding:11px 18px;
+    font-weight:600; font-size:13.5px; cursor:pointer;
+  }
+  button.primary:hover{opacity:.88;}
+  button.ghost{background:none; border:1px solid var(--line); border-radius:8px; padding:8px 13px; font-size:12.5px; cursor:pointer; color:var(--ink-soft);}
+  button.ghost:hover{border-color:var(--accent); color:var(--accent);}
+  button.ghost.active{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+
+  #app{display:none;}
+  .login-card{max-width:340px; margin:60px auto 0;}
+  .login-error{color:var(--red); font-size:12.5px; margin-top:8px; display:none;}
+  .user-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;}
+  .user-row .u-name{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:16px;}
+  .user-row button{background:none; border:1px solid var(--line); color:var(--ink-soft); border-radius:8px; padding:7px 12px; font-size:12px; cursor:pointer;}
+
+  .stat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px;}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px;}
+  .stat .num{font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:700;}
+  .stat .lbl{font-size:10.5px; color:var(--ink-soft); margin-top:2px;}
+
+  .search-row{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .date-row{display:grid; grid-template-columns:1fr 1fr auto; gap:8px; align-items:end; margin-bottom:14px;}
+  .date-row .field{margin-bottom:0;}
+
+  .device-item{border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:10px; cursor:pointer;}
+  .device-item:hover{border-color:var(--accent);}
+  .device-top{display:flex; justify-content:space-between; align-items:flex-start;}
+  .device-model{font-weight:600; font-size:14px;}
+  .device-code{font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--ink-soft); margin-top:2px;}
+  .pill{font-size:11px; font-weight:600; padding:4px 10px; border-radius:20px; white-space:nowrap;}
+  .device-detail{margin-top:12px; padding-top:12px; border-top:1px solid var(--line); font-size:12.5px; display:none;}
+  .device-detail.open{display:block;}
+  .device-detail .d-line{margin-bottom:6px;}
+  .device-detail .d-line span{color:var(--ink-soft); display:block; font-size:11px;}
+  .approve-box{background:#FBF0DD; border:1px solid #EFD8A6; border-radius:9px; padding:12px; margin-top:10px;}
+  .approve-box textarea{width:100%; font-family:'Inter',sans-serif; font-size:12.5px; border:1.5px solid var(--line); border-radius:8px; padding:8px 10px; margin-top:8px; background:var(--card); color:var(--ink); resize:vertical;}
+  .approve-box .diag-item{padding:8px 0; border-top:1px solid #EFD8A6;}
+  .approve-box .diag-item:first-of-type{border-top:none;}
+  .approve-box .item-state{font-size:11.5px; font-weight:600; display:inline-block;}
+  .approve-box .item-state.ok{color:var(--green);}
+  .approve-box .item-state.no{color:var(--red);}
+  .approve-box .item-actions{display:flex; gap:8px; margin-top:6px;}
+  .approve-box .item-note{font-size:11.5px; color:var(--ink-soft); margin-top:4px; font-style:italic;}
+  .empty{color:var(--ink-soft); font-size:13px; padding:16px 0; text-align:center;}
+
+  .tx-line{display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid #EEEDE7; font-size:12.5px;}
+  .tx-line:last-child{border-bottom:none;}
+
+  .gallery-block{margin-top:10px;}
+  .gallery-title{font-size:11px; font-weight:600; color:var(--ink-soft); margin-bottom:6px;}
+  .img-gallery{display:flex; gap:8px; flex-wrap:wrap;}
+  .img-gallery img{width:56px; height:56px; object-fit:cover; border-radius:8px; border:1px solid var(--line); cursor:pointer;}
+  .lightbox{display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:100; align-items:center; justify-content:center; padding:24px;}
+  .lightbox.show{display:flex;}
+  .lightbox img{max-width:100%; max-height:100%; border-radius:8px;}
+
+  @media (max-width:480px){
+    html{-webkit-text-size-adjust:100%;}
+    .wrap{padding:20px 14px 50px;}
+    input, select, textarea{font-size:16px;} /* prevents iOS Safari auto-zoom on focus */
+    .date-row{grid-template-columns:1fr 1fr; }
+    .date-row button{grid-column:1/-1; width:100%;}
+    .stat-grid{gap:8px;}
+    .stat .num{font-size:17px;}
+    .search-row{gap:6px;}
+    .search-row button{flex:1; text-align:center;}
+    .user-row{flex-wrap:wrap; gap:8px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <img src="logo.png" alt="Appleko" style="height:44px; width:auto;">
+    <div class="brand-name" style="margin-left:2px;">Bayi Portalı</div>
+  </div>
+
+  <div id="loginScreen">
+    <div class="card login-card">
+      <h1>Bayi Girişi</h1>
+      <p class="subtitle">Cihazlarınızı ve hesabınızı takip edin</p>
+      <div class="field"><label>Kullanıcı Adı</label><input id="login-username" placeholder="bayi.adi"></div>
+      <div class="field"><label>Şifre</label><input id="login-password" type="password" placeholder="••••••••"></div>
+      <div class="field"><label>Telefon Numarası</label><input id="login-phone" type="tel" placeholder="05xx xxx xx xx"></div>
+      <div class="field" style="display:flex; align-items:center; gap:7px;">
+        <input type="checkbox" id="login-remember" checked style="width:auto;">
+        <label style="margin:0; font-weight:500; color:var(--ink); font-size:13px;" for="login-remember">Beni hatırla</label>
+      </div>
+      <button class="primary" style="width:100%;" onclick="doLogin()">Giriş Yap</button>
+      <div class="login-error" id="loginError">Kullanıcı adı, şifre veya telefon numarası hatalı.</div>
+    </div>
+  </div>
+
+  <div id="app">
+    <div class="user-row">
+      <div>
+        <div class="u-name" id="dealerNameLabel"></div>
+        <div class="subtitle" style="margin:0;">Bayi Hesabınız</div>
+      </div>
+      <button onclick="doLogout()">Çıkış Yap</button>
+    </div>
+
+    <div class="stat-grid" id="statGrid"></div>
+
+    <div class="card">
+      <h3>Hesap / Bakiye</h3>
+      <div id="balanceBox"></div>
+    </div>
+
+    <div class="card">
+      <h3>Cihazlarım</h3>
+      <div class="search-row">
+        <button class="ghost search-mode-btn active" data-mode="imei" onclick="setSearchMode('imei')">IMEI / Seri No ile Bul</button>
+        <button class="ghost search-mode-btn" data-mode="model" onclick="setSearchMode('model')">Cihaz Modeli ile Bul</button>
+      </div>
+      <div class="field"><input id="device-search" placeholder="Aramak için yazmaya başlayın..." oninput="renderDevices()"></div>
+      <div class="date-row">
+        <div class="field"><label>Başlangıç Tarihi</label><input id="date-from" type="date" onchange="renderDevices()"></div>
+        <div class="field"><label>Bitiş Tarihi</label><input id="date-to" type="date" onchange="renderDevices()"></div>
+        <button class="ghost" onclick="clearDateFilter()">Temizle</button>
+      </div>
+      <div id="deviceList"></div>
+    </div>
+  </div>
+</div>
+<div class="lightbox" id="lightbox" onclick="closeLightbox()"><img src=""></div>
+
+<script>
+const API_BASE = 'https://backend-production-a04d.up.railway.app/api';
+
+const STATUS_LABELS = {
+  RECEIVED:'Alındı', DIAGNOSING:'İnceleniyor', DIAGNOSIS_DONE:'Arıza Tespiti Bitti',
+  AWAITING_PARTS:'Parça Bekleniyor', APPROVED:'Fiyat Onaylandı - Onarılıyor', IN_REPAIR:'Tamir Ediliyor',
+  TESTING:'Test Ediliyor', READY:'Teslime Hazır', SHIPPED:'Kargoya Verildi', DELIVERED:'Teslim Edildi',
+  RETURN_REQUESTED:'İade İstendi', RETURNED:'İade Edildi', CANCELLED:'İptal Edildi'
+};
+const STATUS_COLORS = {
+  RECEIVED:['#5A5C66','#EEEDE7'], DIAGNOSING:['#2F5EFF','#E9EEFF'], DIAGNOSIS_DONE:['#E8A33D','#FBF0DD'],
+  AWAITING_PARTS:['#8B5CF6','#F0EBFD'], APPROVED:['#0D9488','#DFF5F2'], IN_REPAIR:['#6366F1','#E9E9FD'],
+  TESTING:['#0EA5E9','#E0F4FE'], READY:['#65A30D','#EEF5DC'], SHIPPED:['#0369A1','#DFF0FB'], DELIVERED:['#2E9E6D','#E4F3EC'],
+  RETURN_REQUESTED:['#EA580C','#FDEAD9'], RETURNED:['#C1442A','#FBEAE6'], CANCELLED:['#BE185D','#FCE4EF']
+};
+
+function esc(str){
+  if(str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+let authToken = null;
+let currentDealer = null;
+let devices = [];
+let searchMode = 'imei';
+let openDeviceId = null;
+
+function pill(status){
+  const [c,bg] = STATUS_COLORS[status] || ['#5A5C66','#EEEDE7'];
+  return `<span class="pill" style="color:${c}; background:${bg};">${STATUS_LABELS[status]||status}</span>`;
+}
+
+function imgGallery(images, title){
+  if(!images || !images.length) return '';
+  return `
+    <div class="gallery-block" onclick="event.stopPropagation()">
+      <div class="gallery-title">${title}</div>
+      <div class="img-gallery">
+        ${images.map(src=>`<img src="${esc(src)}" onclick="openLightbox('${esc(src)}')">`).join('')}
+      </div>
+    </div>`;
+}
+function openLightbox(src){
+  const box = document.getElementById('lightbox');
+  box.querySelector('img').src = src;
+  box.classList.add('show');
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('show');
+}
+
+async function apiFetch(path, options = {}){
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(authToken ? {Authorization: `Bearer ${authToken}`} : {}),
+      ...(options.headers || {})
+    }
+  });
+  if(res.status === 401){ doLogout(); throw new Error('Oturum süresi doldu'); }
+  return res;
+}
+
+async function doLogin(){
+  const username = document.getElementById('login-username').value.trim().toLowerCase();
+  const password = document.getElementById('login-password').value;
+  const phone = document.getElementById('login-phone').value.trim();
+  const errorEl = document.getElementById('loginError');
+  try{
+    const res = await fetch(`${API_BASE}/auth/dealer-login`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ username, password, phone })
+    });
+    if(!res.ok){ errorEl.style.display = 'block'; return; }
+    const data = await res.json();
+    authToken = data.token;
+    const remember = document.getElementById('login-remember').checked;
+    (remember ? localStorage : sessionStorage).setItem('teknonand_dealer_token', authToken);
+    errorEl.style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('login-username').value = '';
+    document.getElementById('login-password').value = '';
+    document.getElementById('login-phone').value = '';
+    await loadAndRenderAll();
+  }catch(e){
+    errorEl.textContent = 'Bağlantı hatası, lütfen tekrar deneyin.';
+    errorEl.style.display = 'block';
+  }
+}
+
+function doLogout(){
+  authToken = null;
+  currentDealer = null;
+  localStorage.removeItem('teknonand_dealer_token');
+  sessionStorage.removeItem('teknonand_dealer_token');
+  if('caches' in window) caches.delete('teknonand-bayi-v1').catch(()=>{});
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'block';
+}
+
+async function tryResumeSession(){
+  const saved = localStorage.getItem('teknonand_dealer_token') || sessionStorage.getItem('teknonand_dealer_token');
+  if(!saved) return;
+  authToken = saved;
+  try{
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    await loadAndRenderAll();
+  }catch(e){
+    doLogout();
+  }
+}
+
+function setSearchMode(mode){
+  searchMode = mode;
+  document.querySelectorAll('.search-mode-btn').forEach(b=>b.classList.toggle('active', b.dataset.mode===mode));
+  renderDevices();
+}
+
+function clearDateFilter(){
+  document.getElementById('date-from').value = '';
+  document.getElementById('date-to').value = '';
+  renderDevices();
+}
+
+async function loadAndRenderAll(){
+  const [dealerRes, devicesRes] = await Promise.all([
+    apiFetch('/dealers/me'),
+    apiFetch('/dealers/me/devices')
+  ]);
+  currentDealer = await dealerRes.json();
+  devices = await devicesRes.json();
+  document.getElementById('dealerNameLabel').textContent = currentDealer.name;
+  renderAll();
+}
+
+function renderAll(){
+  const activeCount = devices.filter(d=>d.status!=='DELIVERED' && d.status!=='SHIPPED').length;
+  const balance = parseFloat(currentDealer.balance) || 0;
+
+  document.getElementById('statGrid').innerHTML = `
+    <div class="stat"><div class="num" style="color:${balance>0?'var(--red)':'var(--green)'}">₺${balance.toFixed(0)}</div><div class="lbl">Veresiye Bakiyesi</div></div>
+    <div class="stat"><div class="num">${devices.length}</div><div class="lbl">Toplam Cihaz</div></div>
+    <div class="stat"><div class="num">${activeCount}</div><div class="lbl">Aktif Serviste</div></div>
+  `;
+
+  const txs = currentDealer.transactions||[]; // backend zaten en yeniden en eskiye sıralı döner
+  document.getElementById('balanceBox').innerHTML = txs.length ? txs.map(t=>`
+    <div class="tx-line">
+      <span style="color:${t.type==='VERESIYE_SATIS'?'var(--red)':'var(--green)'}; font-weight:600;">${t.type==='VERESIYE_SATIS'?'Veresiye Satış':'Tahsilat'}</span>
+      <span>₺${(parseFloat(t.amount)||0).toFixed(2)} · ${new Date(t.createdAt).toLocaleString('tr-TR', {dateStyle:'medium', timeStyle:'short'})}</span>
+    </div>`).join('') : `<p class="empty">Henüz hesap hareketi yok</p>`;
+
+  renderDevices();
+}
+
+function renderDevices(){
+  const query = document.getElementById('device-search').value.trim().toLowerCase();
+  const fromRaw = document.getElementById('date-from').value;
+  const toRaw = document.getElementById('date-to').value;
+
+  let list = devices;
+  if(query){
+    list = list.filter(d=>{
+      if(searchMode==='imei') return (d.imeiSerial||'').toLowerCase().includes(query);
+      if(searchMode==='model') return (d.model||'').toLowerCase().includes(query);
+      return true;
+    });
+  }
+  if(fromRaw){
+    const from = new Date(fromRaw);
+    list = list.filter(d => new Date(d.createdAt) >= from);
+  }
+  if(toRaw){
+    const to = new Date(toRaw); to.setHours(23,59,59,999);
+    list = list.filter(d => new Date(d.createdAt) <= to);
+  }
+  list = list.slice().sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
+
+  const box = document.getElementById('deviceList');
+  if(!list.length){
+    box.innerHTML = `<p class="empty">${query||fromRaw||toRaw ? 'Eşleşen cihaz bulunamadı' : 'Henüz cihazınız yok'}</p>`;
+    return;
+  }
+
+  box.innerHTML = list.map(d=>{
+    const parts = d.parts || [];
+    const total = parts.reduce((s,p)=>{
+      const price = parseFloat(p.price)||0;
+      return s + (p.vatMode==='HARIC' ? price*1.2 : price);
+    }, 0);
+    const isOpen = openDeviceId === d.id;
+    const needsApproval = d.status === 'DIAGNOSIS_DONE' && !d.dealerApproved;
+    return `
+    <div class="device-item" onclick="toggleDevice('${d.id}')">
+      <div class="device-top">
+        <div>
+          <div class="device-model">${esc(d.model)}</div>
+          <div class="device-code">${esc(d.trackingCode)}</div>
+        </div>
+        ${pill(d.status)}
+      </div>
+      <div class="device-detail ${isOpen?'open':''}">
+        <div class="d-line"><span>IMEI / Seri No</span>${esc(d.imeiSerial) || '—'}</div>
+        <div class="d-line"><span>Arıza</span>${esc(d.issueDescription) || '—'}</div>
+        <div class="d-line"><span>Kayıt Tarihi</span>${new Date(d.createdAt).toLocaleString('tr-TR')}</div>
+        ${parts.length ? `
+        <div class="d-line" style="margin-top:8px;">
+          <span>Yapılan İşlemler</span>
+          <div style="display:flex; flex-direction:column; gap:4px; margin-top:4px;">
+            ${parts.map(p=>{
+              const price = parseFloat(p.price)||0;
+              const gross = p.vatMode==='HARIC' ? price*1.2 : price;
+              return `<div style="display:flex; justify-content:space-between; gap:8px; font-size:13px; color:var(--ink);"><span>${esc(p.name)}</span><span style="white-space:nowrap;">₺${gross.toFixed(2)}</span></div>`;
+            }).join('')}
+          </div>
+        </div>
+        <div class="d-line" style="margin-top:8px; display:flex; justify-content:space-between; align-items:baseline;"><span>Genel Toplam</span><b style="font-size:14px; color:var(--ink);">₺${total.toFixed(2)}</b></div>` : ''}
+        ${(!d.diagnosisItems || !d.diagnosisItems.length) && d.diagnosisText ? `<div class="d-line"><span>Arıza Tespiti</span>${esc(d.diagnosisText)}</div>` : ''}
+        ${(!d.diagnosisItems || !d.diagnosisItems.length) && d.estimatedPrice ? `<div class="d-line"><span>Tahmini Fiyat</span>₺${d.estimatedPrice}</div>` : ''}
+        ${imgGallery(d.diagnosisImages, 'Arıza Tespiti Görselleri')}
+        ${(d.diagnosisItems && d.diagnosisItems.length) ? (()=>{
+          const anyPending = d.diagnosisItems.some(it=>it.approved===null||it.approved===undefined);
+          return `
+          <div class="approve-box" onclick="event.stopPropagation()">
+            <div style="font-weight:600; margin-bottom:4px;">${anyPending ? 'Her arıza kalemi için ayrı ayrı onayınız bekleniyor' : 'Arıza Kalemleri'}</div>
+            ${d.diagnosisItems.map(it=>{
+              const responded = it.approved===true || it.approved===false;
+              const stateLabel = it.approved===true ? '<span class="item-state ok">✓ Onaylandı</span>' : it.approved===false ? '<span class="item-state no">✕ Yapılmasın dediniz</span>' : '';
+              const noteLine = (responded && it.respondNote) ? `<div class="item-note">Notunuz: ${esc(it.respondNote)}</div>` : '';
+              const actions = !responded ? `
+                <div class="item-actions">
+                  <button class="primary" onclick="respondDealerDiagnosisItem('${d.id}','${it.id}',true)">Onaylıyorum</button>
+                  <button class="ghost" style="border-color:var(--red); color:var(--red);" onclick="respondDealerDiagnosisItem('${d.id}','${it.id}',false)">Yapılmasın</button>
+                </div>` : '';
+              return `<div class="diag-item"><div class="d-line"><span>${esc(it.description)}</span>₺${it.price}</div>${stateLabel}${noteLine}${actions}</div>`;
+            }).join('')}
+            ${anyPending ? `
+            <textarea id="approveNote-${d.id}" rows="2" placeholder="Genel bir not eklemek ister misiniz? (opsiyonel)"></textarea>
+            <button class="ghost" style="border-color:var(--red); color:var(--red); margin-top:8px; width:100%;" onclick="requestReturnDevice('${d.id}')">Hiçbirini Onaylamıyorum, İade İstiyorum</button>` : ''}
+          </div>`;
+        })() : ''}
+        ${(needsApproval && (!d.diagnosisItems || !d.diagnosisItems.length)) ? `
+          <div class="approve-box" onclick="event.stopPropagation()">
+            Bu cihaz için tespit edilen arıza ve tahmini fiyatı onaylıyor musunuz?
+            <textarea id="approveNote-${d.id}" rows="2" placeholder="Eklemek istediğiniz bir not var mı? (opsiyonel)"></textarea>
+            <div style="margin-top:8px; display:flex; gap:8px;">
+              <button class="primary" onclick="approveDevice('${d.id}')">Onaylıyorum</button>
+              <button class="ghost" style="border-color:var(--red); color:var(--red);" onclick="requestReturnDevice('${d.id}')">İade İstiyorum</button>
+            </div>
+          </div>` : ''}
+        ${d.dealerApproved ? `<div class="d-line" style="color:var(--green); font-weight:600;">✓ Fiyat onaylandı</div>` : ''}
+        ${d.status === 'RETURNED' ? imgGallery(d.returnImages, 'İade Görselleri') : ''}
+        ${['READY','SHIPPED','DELIVERED'].includes(d.status) ? imgGallery(d.readyImages, 'Teslime Hazır Görselleri') : ''}
+        ${d.status === 'DELIVERED' ? imgGallery(d.deliveryImages, 'Teslim Görselleri') : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleDevice(id){
+  openDeviceId = openDeviceId === id ? null : id;
+  renderDevices();
+}
+
+async function approveDevice(id){
+  const noteEl = document.getElementById('approveNote-'+id);
+  const note = noteEl ? noteEl.value.trim() : '';
+  try{
+    const res = await apiFetch(`/dealers/me/devices/${id}/approve`, {
+      method: 'POST',
+      body: JSON.stringify({ note: note || undefined })
+    });
+    if(!res.ok) return;
+    const updated = await res.json();
+    const idx = devices.findIndex(x=>x.id===id);
+    if(idx>=0) devices[idx] = { ...devices[idx], ...updated };
+    renderDevices();
+  }catch(e){ /* apiFetch zaten 401'de oturumu kapatır */ }
+}
+
+async function respondDealerDiagnosisItem(deviceId, itemId, approved){
+  try{
+    const res = await apiFetch(`/dealers/me/devices/${deviceId}/diagnosis-items/${itemId}/respond`, {
+      method: 'POST',
+      body: JSON.stringify({ approved })
+    });
+    if(!res.ok) return;
+    const updated = await res.json();
+    const idx = devices.findIndex(x=>x.id===deviceId);
+    if(idx>=0) devices[idx] = { ...devices[idx], ...updated };
+    renderDevices();
+  }catch(e){ /* apiFetch zaten 401'de oturumu kapatır */ }
+}
+
+async function requestReturnDevice(id){
+  if(!confirm('Cihazın iadesini istediğinizden emin misiniz? Onay vermezseniz onarım yapılmayacak.')) return;
+  const noteEl = document.getElementById('approveNote-'+id);
+  const note = noteEl ? noteEl.value.trim() : '';
+  try{
+    const res = await apiFetch(`/dealers/me/devices/${id}/request-return`, {
+      method: 'POST',
+      body: JSON.stringify({ note: note || undefined })
+    });
+    if(!res.ok) return;
+    const updated = await res.json();
+    const idx = devices.findIndex(x=>x.id===id);
+    if(idx>=0) devices[idx] = { ...devices[idx], ...updated };
+    renderDevices();
+  }catch(e){ /* apiFetch zaten 401'de oturumu kapatır */ }
+}
+
+tryResumeSession();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
